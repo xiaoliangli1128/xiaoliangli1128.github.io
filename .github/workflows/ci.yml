@@ -1,0 +1,18 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.fork == false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install git+https://4e5f84dfab0bff51daebf770ba5baadccefa4a0d@github.com/squidfunk/mkdocs-material-insiders.git
+      - run: mkdocs gh-deploy --force
+env:
+  GH_TOKEN: 4e5f84dfab0bff51daebf770ba5baadccefa4a0d
