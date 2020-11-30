@@ -1,0 +1,10 @@
+site_name: My Wiki
+theme:
+    icon:
+        logo: material/library
+    name: material
+    language: zh
+    features:
+        - navigation.tabs
+        - navigation.sections        
+        - navigation.expand
