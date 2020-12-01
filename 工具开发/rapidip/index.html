@@ -577,7 +577,7 @@ if __name__ == &quot;__main__&quot;:
 </code></pre>
 
 <h2 id="_2">最终结果</h2>
-<p><img src="img\image-20201201165225695.png" alt="image-20201201165225695" style="zoom: 80%;" /></p>
+<p><img src="img\image-20201201165835271.png" style="zoom:80%;" /></p>
 <h2 id="banner">自己写分组查询语句或者根据端口、Banner查数据</h2>
 <pre><code class="sqlite">SELECT  port,count(port) from Ip_result ir  group by port;
 SELECT ip||&quot;:&quot;||port from Ip_result ir where  ir.port ='7002';
