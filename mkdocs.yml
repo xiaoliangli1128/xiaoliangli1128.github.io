@@ -1,0 +1,12 @@
+site_name: My Info-Sec Wiki
+repo_name: 'GitHub'
+repo_url: 'https://github.com/xiaoliangli1128/'
+theme:
+    icon:
+        logo: material/library
+    name: material
+    language: zh
+    features:
+        - navigation.tabs
+        - navigation.sections        
+        - navigation.expand
